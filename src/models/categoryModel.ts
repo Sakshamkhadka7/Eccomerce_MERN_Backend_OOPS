@@ -1,25 +1,23 @@
 import { Table,Column,Model,DataType } from "sequelize-typescript";
-
 @Table({
-    tableName:"orderDetails",
-    modelName:"OrderDetails",
+    tableName:"categories",
+    modelName:"Category",
     timestamps:true
 })
 
-
-class OrderDetails extends Model{
+class Category extends Model{
     @Column({
         primaryKey:true,
         type:DataType.UUID,
         defaultValue:DataType.UUIDV4
     })
-    orderDetails!:string
+    categoryId!:string
 
     @Column({
-        type:DataType.INTEGER,
+        type:DataType.STRING,
         allowNull:false
     })
-    quantity!:number
+    categoryName!:string
 }
 
-export default OrderDetails
+export default Category
