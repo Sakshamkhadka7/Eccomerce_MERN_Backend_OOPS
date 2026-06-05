@@ -1,7 +1,7 @@
 import { Table,Column,Model,DataType, AllowNull } from "sequelize-typescript";
 import { PaymentMethod, PaymentStatus } from "../../globalTypes/index.js";
 
-Table({
+@Table({
     tableName:"payment",
     modelName:"Table",
     timestamps:true

@@ -54,3 +54,5 @@ class Product extends Model {
   })
   productImage!: string;
 }
+
+export default Product
