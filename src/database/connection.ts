@@ -1,7 +1,9 @@
 import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config.js";
 
-const sequelize=new Sequelize(envConfig.connectionString as string);
+const sequelize=new Sequelize(envConfig.connectionString as string,{
+    
+});
 
 try {
     sequelize.authenticate()
@@ -14,4 +16,4 @@ try {
     console.log("Error occured ar connection of sequelize",error);
 }
 
-export default sequelize;
+export default sequelize;   
