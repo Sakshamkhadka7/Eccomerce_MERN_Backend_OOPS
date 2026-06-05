@@ -1,5 +1,5 @@
 import { Table,Column,Model,DataType, AllowNull } from "sequelize-typescript";
-import { PaymentMethod, PaymentStatus } from "../globalTypes/index.js";
+import { PaymentMethod, PaymentStatus } from "../../globalTypes/index.js";
 
 Table({
     tableName:"payment",

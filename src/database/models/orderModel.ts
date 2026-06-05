@@ -1,5 +1,5 @@
 import { Table,Column,DataType,Model } from "sequelize-typescript";
-import { OrderStaus } from "../globalTypes/index.js";
+import { OrderStaus } from "../../globalTypes/index.js";
 
 @Table({
     tableName:"order",
