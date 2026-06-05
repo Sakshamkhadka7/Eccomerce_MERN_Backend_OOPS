@@ -1,7 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config.js";
-import path from "path";
-import { fileURLToPath } from "url";
+
 import User from "./models/userModel.js";
 import Order from "./models/orderModel.js";
 import Category from "./models/categoryModel.js";
@@ -10,52 +9,66 @@ import Payment from "./models/paymentModel.js";
 import OrderDetails from "./models/orderDetailModel.js";
 import Cart from "./models/cartModel.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// Create Sequelize instance
 const sequelize = new Sequelize(envConfig.connectionString as string, {
-  models: [__dirname + "/models"],
+  models: [
+    User,
+    Order,
+    Category,
+    Product,
+    Payment,
+    OrderDetails,
+    Cart
+  ],
 });
 
-try {
-  sequelize
-    .authenticate()
-    .then(() => {
-      console.log("Authentication is right");
-    })
-    .catch((err) => {
-      console.log("Error occured at connection", err);
-    });
-} catch (error) {
-  console.log("Error occured ar connection of sequelize", error);
-}
 
-sequelize.sync({ force: false, alter: false }).then(() => {
-  console.log("Synced");
-});
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log("✅ Authentication successful");
+  })
+  .catch((err) => {
+    console.log("❌ Database connection error:", err);
+  });
 
-//User and Order
+// Sync models
+sequelize
+  .sync({ force: false, alter: false })
+  .then(() => {
+    console.log("✅ Database synced");
+  })
+  .catch((err) => {
+    console.log("❌ Sync error:", err);
+  });
+
+
+// User → Orders (1 user has many orders)
 User.hasMany(Order, { foreignKey: "userId" });
-Order.belongsTo(User, { foreignKey: "orderId" });
+Order.belongsTo(User, { foreignKey: "userId" });
 
-// Category and Product
-Category.hasOne(Product, { foreignKey: "productId" });
+// Category → Products (1 category has many products)
+Category.hasMany(Product, { foreignKey: "categoryId" });
 Product.belongsTo(Category, { foreignKey: "categoryId" });
 
-// Payment and Order
-Payment.hasOne(Order, { foreignKey: "orderId" });
-Order.belongsTo(Payment, { foreignKey: "paymentId" });
+// Payment → Order (1 payment belongs to 1 order)
+Order.hasOne(Payment, { foreignKey: "orderId" });
+Payment.belongsTo(Order, { foreignKey: "orderId" });
 
-// Product and OrderDetails
-Product.hasMany(OrderDetails, { foreignKey: "orderDeatailsId" });
+// Order → OrderDetails (1 order has many order items)
+Order.hasMany(OrderDetails, { foreignKey: "orderId" });
+OrderDetails.belongsTo(Order, { foreignKey: "orderId" });
+
+// Product → OrderDetails
+Product.hasMany(OrderDetails, { foreignKey: "productId" });
 OrderDetails.belongsTo(Product, { foreignKey: "productId" });
 
-// User and Cart
-User.hasOne(Cart, { foreignKey: "cartId" });
+// User → Cart (1 user has 1 cart)
+User.hasOne(Cart, { foreignKey: "userId" });
 Cart.belongsTo(User, { foreignKey: "userId" });
 
-// Cart and Product
-Product.hasMany(Cart, { foreignKey: "cartId" });
+// Product → Cart (1 product can be in many carts)
+Product.hasMany(Cart, { foreignKey: "productId" });
 Cart.belongsTo(Product, { foreignKey: "productId" });
 
 export default sequelize;
