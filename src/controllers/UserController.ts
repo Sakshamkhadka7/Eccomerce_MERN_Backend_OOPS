@@ -79,16 +79,21 @@ class UserController {
 
   static async forgetPassword(req:Request,res:Response){
     const {email} =req.body;
-     if(!email){
-      res.status(400).json({message:"Gmal not found"})
+     if(!email) {
+      res.status(400).json({message:"Please provide a email"})
       return
      }
 
-     const user=await User.findAll({
+     const [user]=await User.findAll({
       where:{
         email:email
       }
      })
+
+     if(!user){
+       res.status(400).json({message:"email not register"})
+      return
+     }
   }
 }
 
