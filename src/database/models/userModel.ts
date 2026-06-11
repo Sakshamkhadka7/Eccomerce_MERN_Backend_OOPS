@@ -13,38 +13,38 @@ class User extends Model{
         type : DataType.UUID, 
         defaultValue : DataType.UUIDV4
     })
-    userId!: string
+   declare userId: string
 
     @Column({
         type : DataType.STRING
     })
-    username!: string
+   declare username: string
 
     @Column({
         type : DataType.STRING
     })
-    email!: string
+   declare email: string
 
     @Column({
         type : DataType.STRING
     })
-    password!: string 
+    declare  password: string 
 
     @Column({
         type : DataType.ENUM('customer','admin'), 
         defaultValue : 'customer'
     })
-    role!: string
+   declare role: string
 
     @Column({
         type : DataType.STRING
     })
-    otp!: string
+   declare otp: string
 
     @Column({
         type : DataType.STRING
     })
-    otpGeneratedTime!: string
+   declare otpGeneratedTime: string
 }
 
 export default User

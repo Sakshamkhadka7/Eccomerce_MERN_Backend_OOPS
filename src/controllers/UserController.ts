@@ -50,22 +50,22 @@ class UserController {
       where: {
         email: email,
       },
-    });
-
+    })
     if (!user) {
       res.status(400).json({
         message: "User not found please register",
       });
       return;
     } else {
-      const equal = bcrypt.compare(password, user.password);
+      console.log("USer json", user);
+      const equal =await bcrypt.compare(password,  user.dataValues.password);
       if (!equal) {
         res.status(400).json({
           message: "Invalid credentials",
         });
         return;
       } else {
-       const token=generateToken(user.id);
+       const token=generateToken(user.userId);
 
         res.status(200).json({
           message: "Login successfully",
