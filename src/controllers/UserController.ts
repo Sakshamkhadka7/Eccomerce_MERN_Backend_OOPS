@@ -76,6 +76,20 @@ class UserController {
       }
     }
   }
+
+  static async forgetPassword(req:Request,res:Response){
+    const {email} =req.body;
+     if(!email){
+      res.status(400).json({message:"Gmal not found"})
+      return
+     }
+
+     const user=await User.findAll({
+      where:{
+        email:email
+      }
+     })
+  }
 }
 
 export default UserController;
