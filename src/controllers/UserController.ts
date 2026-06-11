@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from "../database/models/userModel.js";
 import bcrypt from "bcryptjs";
+import generateToken from "../services/generateToken.js";
 
 class UserController {
   static async register(req: Request, res: Response) {
@@ -35,8 +36,9 @@ class UserController {
     });
   }
 
-  async login(req: Request, res: Response) {
+  static async login(req: Request, res: Response) {
     const { email, password } = req.body;
+    console.log("User password", password);
     if (!email || !password) {
       res.status(400).json({
         message: "Please provide email and password",
@@ -44,26 +46,30 @@ class UserController {
 
       return;
     }
-    const user = await User.findAll({
+    const [user] = await User.findAll({
       where: {
         email: email,
       },
     });
 
-    if (user.length == 0) {
+    if (!user) {
       res.status(400).json({
         message: "User not found please register",
       });
+      return;
     } else {
-      const equal = bcrypt.compareSync(password, user[0].password);
+      const equal = bcrypt.compare(password, user.password);
       if (!equal) {
         res.status(400).json({
           message: "Invalid credentials",
         });
         return;
       } else {
+       const token=generateToken(user.id);
+
         res.status(200).json({
           message: "Login successfully",
+          token
         });
 
         return;
