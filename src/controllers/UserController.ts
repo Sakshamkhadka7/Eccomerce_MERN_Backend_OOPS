@@ -142,18 +142,19 @@ class UserController {
 
     const [data] = await User.findAll({
       where: {
-        otp: otp,
-        email: email,
+         otp,
+       email,
       },
     });
 
     if (!data) {
       res.status(400).json({
-        message: "email not found",
+        message: "email not found or otp doesnot match",
       });
+      return
     }
-
-    checkOtpExpiration(res, data.otp, 120000);
+    const otpTime=data.otpGeneratedTime
+    checkOtpExpiration(res,otpTime, 120000);
   }
 }
 
