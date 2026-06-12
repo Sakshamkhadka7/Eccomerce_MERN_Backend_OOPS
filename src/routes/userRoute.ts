@@ -6,5 +6,6 @@ const userRouter:Router=express.Router()
 
 userRouter.route("/register").post(UserController.register)
 userRouter.route("/login").post(UserController.login);
+userRouter.route("/forgotPassword").post(UserController.forgetPassword)
 
 export default userRouter

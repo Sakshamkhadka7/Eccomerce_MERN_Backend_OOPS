@@ -3,6 +3,7 @@ import User from "../database/models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../services/generateToken.js";
 import generateOtp from "../services/generateOtp.js";
+import sendEmail from "../services/sendMail.js";
 
 class UserController {
   static async register(req: Request, res: Response) {
@@ -51,7 +52,7 @@ class UserController {
       where: {
         email: email,
       },
-    })
+    });
     if (!user) {
       res.status(400).json({
         message: "User not found please register",
@@ -59,18 +60,18 @@ class UserController {
       return;
     } else {
       console.log("USer json", user);
-      const equal =await bcrypt.compare(password,  user.dataValues.password);
+      const equal = await bcrypt.compare(password, user.dataValues.password);
       if (!equal) {
         res.status(400).json({
           message: "Invalid credentials",
         });
         return;
       } else {
-       const token=generateToken(user.userId);
+        const token = generateToken(user.userId);
 
         res.status(200).json({
           message: "Login successfully",
-          token
+          token,
         });
 
         return;
@@ -78,27 +79,34 @@ class UserController {
     }
   }
 
-  static async forgetPassword(req:Request,res:Response){
-    const {email} =req.body;
-     if(!email) {
-      res.status(400).json({message:"Please provide a email"})
-      return
-     }
+  static async forgetPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    if (!email) {
+      res.status(400).json({ message: "Please provide a email" });
+      return;
+    }
 
-     const [user]=await User.findAll({
-      where:{
-        email:email
-      }
-     })
+    const [user] = await User.findAll({
+      where: {
+        email: email,
+      },
+    });
 
-     if(!user){
-       res.status(400).json({message:"email not register"})
-      return
-     }
+    if (!user) {
+      res.status(400).json({ message: "email not register" });
+      return;
+    }
 
-      const otp=generateOtp()
-      
+    const otp = generateOtp();
+    await sendEmail({
+      to: email,
+      subject: "Change password by digital website",
+      text: `You request to change a password ${otp} `,
+    });
 
+    res.status(200).json({
+      message:"Password Reset OTP sent !!"
+    })
   }
 }
 

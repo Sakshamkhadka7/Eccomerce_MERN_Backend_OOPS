@@ -7,5 +7,6 @@ export const envConfig = {
   connectionString: process.env.CONNECTIONSTRING,
   secretKey: process.env.JWT_SECRET_KEY,
   expiredDay:process.env.JWT_EXPIRES_IN,
-  sendMail:process.env.EMAIL
+  sendMail:process.env.EMAIL,
+  emailPass:process.env.EMAIL_PASSWORD
 };
