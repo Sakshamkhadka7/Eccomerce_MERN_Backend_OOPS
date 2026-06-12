@@ -33,6 +33,13 @@ class UserController {
       email,
       password: bcrypt.hashSync(password, 10),
     });
+
+    await sendEmail({
+      to: email,
+      subject: "Register Successfully",
+      text: "You have register successfully",
+    });
+
     res.status(201).json({
       message: "User created successfully",
     });
@@ -80,6 +87,7 @@ class UserController {
   }
 
   static async forgetPassword(req: Request, res: Response) {
+    console.log(req.body);
     const { email } = req.body;
     if (!email) {
       res.status(400).json({ message: "Please provide a email" });
@@ -105,8 +113,8 @@ class UserController {
     });
 
     res.status(200).json({
-      message:"Password Reset OTP sent !!"
-    })
+      message: "Password Reset OTP sent !!",
+    });
   }
 }
 
