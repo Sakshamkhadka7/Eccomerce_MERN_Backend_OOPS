@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../database/models/userModel.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../services/generateToken.js";
+import generateOtp from "../services/generateOtp.js";
 
 class UserController {
   static async register(req: Request, res: Response) {
@@ -95,6 +96,7 @@ class UserController {
       return
      }
 
+      const otp=generateOtp()
       
 
   }
