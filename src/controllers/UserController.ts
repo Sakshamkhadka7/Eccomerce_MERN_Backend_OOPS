@@ -25,7 +25,7 @@ class UserController {
 
     if (data) {
       res.status(400).json({
-        message: "User already exists",
+        message: "Please try again !!",
       });
       return;
     }
