@@ -5,6 +5,7 @@ import generateToken from "../services/generateToken.js";
 import generateOtp from "../services/generateOtp.js";
 import sendEmail from "../services/sendMail.js";
 import checkOtpExpiration from "../services/verifyOtp.js";
+import sendResponse from "../services/sendResponse.js";
 
 class UserController {
   static async register(req: Request, res: Response) {
@@ -140,21 +141,68 @@ class UserController {
       return;
     }
 
+    const [user] = await User.findAll({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        message: "Email not found",
+      });
+      return;
+    }
+
     const [data] = await User.findAll({
       where: {
-         otp,
-       email,
+        otp,
+        email,
       },
     });
 
     if (!data) {
       res.status(400).json({
-        message: "email not found or otp doesnot match",
+        message: "Invalid OTP",
       });
-      return
+      return;
     }
-    const otpTime=data.otpGeneratedTime
-    checkOtpExpiration(res,otpTime, 120000);
+    const otpTime = data.otpGeneratedTime;
+    checkOtpExpiration(res, otpTime, 120000);
+  }
+
+  static async resetPassword(req: Request, res: Response) {
+    const { newPassword, confirmPassword, email } = req.body;
+    if (!newPassword || !confirmPassword || !email) {
+      sendResponse(
+        res,
+        400,
+        "Please provide newPassword,confirmPassword ,email ",
+      );
+
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      sendResponse(res, 400, "newPassword and confirmPasswoerd must be match");
+    }
+
+    const [user] = await User.findAll({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        message: "Email not found",
+      });
+      return;
+    }
+
+    user.password = newPassword;
+    user.save();
+    sendResponse(res, 200, "Password reset succcessfully");
   }
 }
 
