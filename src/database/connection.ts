@@ -32,12 +32,13 @@ sequelize
     console.log("❌ Database connection error:", err);
   });
 
-// Sync models
+// Sync models 
 sequelize
-  .sync({ force: false, alter: false })
+  .sync({ force: false })
   .then(() => {
     console.log("✅ Database synced");
   })
+
   .catch((err) => {
     console.log("❌ Sync error:", err);
   });

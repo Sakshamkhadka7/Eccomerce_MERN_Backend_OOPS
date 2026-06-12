@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import generateToken from "../services/generateToken.js";
 import generateOtp from "../services/generateOtp.js";
 import sendEmail from "../services/sendMail.js";
+import checkOtpExpiration from "../services/verifyOtp.js";
 
 class UserController {
   static async register(req: Request, res: Response) {
@@ -37,7 +38,7 @@ class UserController {
     await sendEmail({
       to: email,
       subject: "Register Successfully",
-      text: "You have register successfully",
+      text: "Welcome to DigitalPasal ,You have register successfully",
     });
 
     res.status(201).json({
@@ -87,6 +88,7 @@ class UserController {
   }
 
   static async forgetPassword(req: Request, res: Response) {
+    console.log("FORGET PASSWORD CONTROLLER HIT");
     console.log(req.body);
     const { email } = req.body;
     if (!email) {
@@ -111,10 +113,47 @@ class UserController {
       subject: "Change password by digital website",
       text: `You request to change a password ${otp} `,
     });
+    console.log("Before Update:", user.toJSON());
+
+    user.otp = otp.toString();
+    user.otpGeneratedTime = Date.now().toString();
+
+    console.log("After Update:", user.toJSON());
+    console.log("Changed Fields:", user.changed());
+
+    await user.save();
+
+    console.log("After Save:", user.toJSON());
 
     res.status(200).json({
       message: "Password Reset OTP sent !!",
     });
+  }
+
+  static async verifyOtp(req: Request, res: Response) {
+    const { otp, email } = req.body;
+    if (!otp || !email) {
+      res.status(400).json({
+        message: "OTP and email is mandatory",
+      });
+
+      return;
+    }
+
+    const [data] = await User.findAll({
+      where: {
+        otp: otp,
+        email: email,
+      },
+    });
+
+    if (!data) {
+      res.status(400).json({
+        message: "email not found",
+      });
+    }
+
+    checkOtpExpiration(res, data.otp, 120000);
   }
 }
 
