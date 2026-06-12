@@ -200,7 +200,7 @@ class UserController {
       return;
     }
 
-    user.password = newPassword;
+    user.password = bcrypt.hashSync(newPassword,12);
     user.save();
     sendResponse(res, 200, "Password reset succcessfully");
   }

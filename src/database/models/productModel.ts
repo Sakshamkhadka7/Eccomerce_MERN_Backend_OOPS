@@ -18,41 +18,41 @@ class Product extends Model {
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
   })
-  productId!: string;
+ declare productId: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  productName!: string;
+ declare productName: string;
 
   @Column({
     type: DataType.TEXT,
   })
-  productDescriptions!: string;
+ declare productDescriptions: string;
 
   @Column({
     type: DataType.FLOAT,
     allowNull: false,
   })
-  productPrice!: number;
+  declare productPrice: number;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  productTotalStock!: number;
+ declare productTotalStock: number;
 
   @Column({
     type: DataType.FLOAT,
     allowNull: false,
   })
-  productDiscount!: number;
+ declare productDiscount: number;
 
   @Column({
     type: DataType.STRING,
   })
-  productImage!: string;
+ declare productImage: string;
 }
 
 export default Product
