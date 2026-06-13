@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { envConfig } from "./src/config/config.js";
 import User from "./src/database/models/userModel.js";
 
@@ -10,7 +11,7 @@ const adminSeeder = async () => {
   if (!data) {
     await User.create({
       username: envConfig.adminUsername,
-      password: envConfig.adminPassword,
+      password: bcrypt.hashSync(envConfig.adminPassword as string, 8),
       email: envConfig.adminEmail,
       role: "admin",
     });
