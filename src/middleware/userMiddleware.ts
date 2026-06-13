@@ -6,7 +6,7 @@ class UserMiddleware {
   async isUserLogin(
     req: Request,
     res: Response,
-    nest: NextFunction,
+    next: NextFunction,
   ): Promise<void> {
     const token = req.headers.authorization;
     if (!token) {
@@ -30,4 +30,4 @@ class UserMiddleware {
   }
 }
 
-export default UserMiddleware
+export default new UserMiddleware

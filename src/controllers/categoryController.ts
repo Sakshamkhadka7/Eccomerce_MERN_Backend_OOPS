@@ -50,8 +50,9 @@ class CategoryController {
     });
   }
 
-  async deleteCategory(req: Request, res: Response) {
+  async deleteCategory(req: Request, res: Response):Promise<void> {
     const { id } = req.params;
+    console.log("Delete Id : ",id);
     if (!id) {
       res.status(400).json({
         message: "Please provide a ID",
@@ -61,7 +62,7 @@ class CategoryController {
     }
     const data = await Category.findAll({
       where: {
-        id: id,
+        categoryId: id,
       },
     });
 
@@ -73,7 +74,7 @@ class CategoryController {
     } else {
       await Category.destroy({
         where: {
-          id,
+          categoryId:id,
         },
       });
 
@@ -95,7 +96,7 @@ class CategoryController {
     }
     const data = await Category.findAll({
       where: {
-        id: id,
+        categoryId: id,
       },
     });
 
@@ -111,7 +112,7 @@ class CategoryController {
         },
         {
           where: {
-            id: id,
+            categoryId: id,
           },
         },
       );
