@@ -22,5 +22,6 @@ class CategoryController {
         console.log("Categories already seed");
     }
   }
-
 }
+
+export default new CategoryController
