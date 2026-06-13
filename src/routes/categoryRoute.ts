@@ -9,4 +9,4 @@ categoryRoute.route("/deleteCategory/:id").delete(userMiddleware.accessTo(Role.A
 categoryRoute.route("/getCategory").get(categoryController.getCategory)
 categoryRoute.route("/updateCategory/:id").put(userMiddleware.accessTo(Role.Admin),categoryController.updateCategory)
 
-export default categoryRoute
+export default categoryRoute    
