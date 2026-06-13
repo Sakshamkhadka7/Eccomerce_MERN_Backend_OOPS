@@ -34,7 +34,7 @@ sequelize
 
 // Sync models 
 sequelize
-  .sync({ force: false })
+  .sync({ force: false,alter:false })
   .then(() => {
     console.log("✅ Database synced");
   })
