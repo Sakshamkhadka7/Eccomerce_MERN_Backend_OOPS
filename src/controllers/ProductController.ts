@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import Product from "../database/models/productModel.js";
 import Category from "../database/models/categoryModel.js";
 
-interface ProductRequest extends Request {
-  file?: {
-    filename: string;
-  };
-}
+// interface ProductRequest extends Request {
+//   file?: {
+//     filename: string;
+//     fieldname:string,
+//   };
+// }
 
 interface Update {
   productName?: string;
@@ -19,7 +20,7 @@ interface Update {
 }
 
 class ProductController {
-  async createProduct(req: ProductRequest, res: Response): Promise<void> {
+  async createProduct(req: Request, res: Response): Promise<void> {
     const {
       productName,
       productDescriptions,
@@ -89,7 +90,7 @@ class ProductController {
     });
   }
 
-  async updateProduct(req: ProductRequest, res: Response) {
+  async updateProduct(req: Request, res: Response) {
     const { id } = req.params;
     if (!id) {
       res.status(403).json({
