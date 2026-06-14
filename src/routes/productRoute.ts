@@ -5,7 +5,9 @@ import userMiddleware, { Role } from "../middleware/userMiddleware.js";
 const productRoute=express.Router();
 
 productRoute.route("/addProduct").post(userMiddleware.isUserLogin,userMiddleware.accessTo(Role.Admin),ProductController.createProduct)
-productRoute.route("/getProduct").post(ProductController.createProduct)
+productRoute.route("/getProduct").get(ProductController.getAllProduct)
+productRoute.route("/updateProduct/:id").put(userMiddleware.isUserLogin,userMiddleware.accessTo(Role.Admin),ProductController.updateProduct)
+productRoute.route("/deleteProduct/:id").delete(userMiddleware.isUserLogin,userMiddleware.accessTo(Role.Admin),ProductController.deleteProduct)
 
 
 

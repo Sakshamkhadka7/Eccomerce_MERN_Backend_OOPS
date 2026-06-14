@@ -3,7 +3,7 @@ import Product from "../database/models/productModel.js";
 import Category from "../database/models/categoryModel.js";
 
 interface ProductRequest extends Request {
-  file: {
+  file?: {
     filename: string;
   };
 }
@@ -170,4 +170,4 @@ class ProductController {
   }
 }
 
-export default new ProductController();
+export default new ProductController;
