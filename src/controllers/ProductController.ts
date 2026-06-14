@@ -8,8 +8,18 @@ interface ProductRequest extends Request {
   };
 }
 
+interface Update {
+  productName?: string;
+  productDescriptions?: string;
+  productPrice?: string;
+  productTotalStock?: string;
+  productDiscount?: string;
+  categoryId?: string;
+  productImage?: string;
+}
+
 class ProductController {
-  async createController(req: ProductRequest, res: Response): Promise<void> {
+  async createProduct(req: ProductRequest, res: Response): Promise<void> {
     const {
       productName,
       productDescriptions,
@@ -78,4 +88,86 @@ class ProductController {
       data: datas,
     });
   }
+
+  async updateProduct(req: ProductRequest, res: Response) {
+    const { id } = req.params;
+    if (!id) {
+      res.status(403).json({
+        message: "Id is required",
+      });
+
+      return;
+    }
+
+    const product = await Product.findOne({
+      where: {
+        productId: id,
+      },
+    });
+
+    if (!product) {
+      res.status(404).json({
+        message: "Product with that Id could not be found",
+      });
+      return;
+    }
+    const {
+      productName,
+      productDescriptions,
+      productPrice,
+      productTotalStock,
+      productDiscount,
+      categoryId,
+    } = req.body;
+
+    const updateData: Update = {
+      productName,
+      productDescriptions,
+      productPrice,
+      productTotalStock,
+      productDiscount,
+      categoryId,
+    };
+
+    if (req.file) {
+      updateData.productImage = req.file.filename;
+    }
+
+    await Product.update(updateData, {
+      where: {
+        productId: id,
+      },
+    });
+
+    res.status(200).json({
+      message: "Product updated successfully",
+    });
+  }
+
+  async deleteProduct(req: Request, res: Response) {
+    const { id } = req.params;
+    const datas = await Product.findAll({
+      where: {
+        productId: id,
+      },
+    });
+
+    if (datas.length === 0) {
+      res.status(404).json({
+        message: "Products fetched successfully",
+      });
+      return;
+    } else {
+      await Product.destroy({
+        where: {
+          productId: id,
+        },
+      });
+      res.status(200).json({
+        message: "Product deleted successfully",
+      });
+    }
+  }
 }
+
+export default new ProductController();
