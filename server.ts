@@ -6,11 +6,11 @@ import adminSeeder from "./adminSeeder.js";
 import categoryController from "./src/controllers/categoryController.js";
 
 function startServer() {
-  const PORT = envConfig.port || 5000;
+  const PORT = envConfig.port || 6000;
 
   app.listen(PORT, () => {
     categoryController.seedCategory();
-    console.log(`${PORT} is running on 4000 port`);
+    console.log(`port is running on ${PORT} port`);
     adminSeeder();
   });
 }
