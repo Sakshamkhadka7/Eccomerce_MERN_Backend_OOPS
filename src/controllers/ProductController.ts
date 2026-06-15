@@ -64,6 +64,7 @@ class ProductController {
     const datas = await Product.findAll({
       include: {
         model: Category,
+        attributes:['categoryId','categoryName']
       },
     });
 
@@ -81,6 +82,8 @@ class ProductController {
       },
       include: {
         model: Category,
+        attributes:['categoryId','categoryName']
+
       },
     });
 

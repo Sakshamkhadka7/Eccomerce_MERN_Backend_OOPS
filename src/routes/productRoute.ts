@@ -14,7 +14,7 @@ productRoute
     ProductController.createProduct,
   );
 productRoute.route("/getProduct").get(ProductController.getAllProduct);
-productRoute.route("/getSingleProduct").get(ProductController.getSingleProduct);
+productRoute.route("/getSingleProduct/:id").get(ProductController.getSingleProduct);
 productRoute
   .route("/updateProduct/:id")
   .put(
