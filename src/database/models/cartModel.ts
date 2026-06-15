@@ -12,13 +12,13 @@ class Cart extends  Model{
         type:DataType.UUID,
         defaultValue:DataType.UUIDV4
     })
-    cartId!:string
+   declare cartId:string
 
     @Column({
         type:DataType.INTEGER,
         allowNull:false
     })
-    quantity!:number
+   declare quantity:number
 }
 
 export default Cart

@@ -11,13 +11,13 @@ class Category extends Model{
         type:DataType.UUID,
         defaultValue:DataType.UUIDV4
     })
-    categoryId!:string
+   declare categoryId:string
 
     @Column({
         type:DataType.STRING,
         allowNull:false
     })
-    categoryName!:string
+   declare categoryName:string
 }
 
 export default Category

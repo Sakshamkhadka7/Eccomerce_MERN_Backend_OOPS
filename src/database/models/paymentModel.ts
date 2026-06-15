@@ -13,25 +13,25 @@ class Payment extends Model{
         type:DataType.UUID,
         defaultValue:DataType.UUIDV4
     })
-    paymentId!:string
+   declare paymentId:string
 
     @Column({
         type:DataType.ENUM(PaymentMethod.COD,PaymentMethod.Esewa,PaymentMethod.khalti),
         defaultValue:PaymentMethod.COD
     })
-    paymentMethod!:string
+   declare paymentMethod:string
 
     @Column({
         type:DataType.ENUM(PaymentStatus.Paid,PaymentStatus.Unpaid),
         defaultValue:PaymentStatus.Unpaid
     })
-    paymentStatus!:string
+   declare paymentStatus:string
 
     @Column({
         type:DataType.STRING
     })
 
-    pidx!:string
+   declare pidx:string
 }
 
 export default Payment
