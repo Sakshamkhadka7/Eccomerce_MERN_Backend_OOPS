@@ -14,7 +14,7 @@ class Order extends Model {
   })
   declare orderId: string;
 
-  @Column({
+  @Column({ 
     type: DataType.STRING,
     allowNull: false,
     validate: {
@@ -30,6 +30,11 @@ class Order extends Model {
     type: DataType.STRING,
   })
   declare addressLine: string;
+
+  @Column({
+    type:DataType.STRING
+  })
+  declare products:string
 
   @Column({
     type: DataType.STRING,
