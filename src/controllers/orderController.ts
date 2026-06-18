@@ -2,15 +2,25 @@ import { Request, Response } from "express";
 import sendResponse from "../services/sendResponse.js";
 import Order from "../database/models/orderModel.js";
 import OrderDetails from "../database/models/orderDetailModel.js";
+import { PaymentMethod } from "../globalTypes/index.js";
+import Payment from "../database/models/paymentModel.js";
 
 interface IProduct {
   productId: string;
   productQty: string;
 }
+interface IRequest extends Request {
+  user? :{
+    userId:string,
+    username:string,
+    email:string
+  }
+}
 
 class OrderController {
-  static async createOrder(req: Request, res: Response) {
-    const { phoneNumber, addressLine, totalAmount } = req.body;
+  static async createOrder(req: IRequest, res: Response) {
+     const userId=req.user?.userId
+    const { phoneNumber, addressLine, totalAmount ,paymentMethod} = req.body;
     const products: IProduct[] = req.body;
 
     if (!phoneNumber || !addressLine || !totalAmount || products.length == 0) {
@@ -21,6 +31,7 @@ class OrderController {
       phoneNumber,
       addressLine,
       totalAmount,
+      userId
     });
 
     products.forEach(async(product) => {
@@ -30,6 +41,19 @@ class OrderController {
         orderId: orderData.orderId,
       });
     });
+
+    if(paymentMethod == PaymentMethod.COD){
+      
+     await Payment.create({
+        orderId:orderData.orderId,
+        paymentMethod:paymentMethod
+      })
+
+    }else if(paymentMethod == PaymentMethod.khalti){
+
+    }else {
+
+    }
 
     return sendResponse(res, 201, "Order created successfully", orderData);
   }
