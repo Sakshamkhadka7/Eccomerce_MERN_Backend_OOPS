@@ -21,7 +21,10 @@ class OrderController {
   static async createOrder(req: IRequest, res: Response) {
      const userId=req.user?.userId
     const { phoneNumber, addressLine, totalAmount ,paymentMethod} = req.body;
-    const products: IProduct[] = req.body;
+    const products: IProduct[] = req.body.products
+    console.log(products);
+    products.forEach((prod)=>
+    console.log(prod))
 
     if (!phoneNumber || !addressLine || !totalAmount || products.length == 0) {
       return sendResponse(res, 403, "All fields are mandatory to filled");
@@ -36,7 +39,7 @@ class OrderController {
 
     products.forEach(async(product) => {
     await  OrderDetails.create({
-        orderDetails: product.productQty,
+        quantity: product.productQty,
         productId: product.productId,
         orderId: orderData.orderId,
       });

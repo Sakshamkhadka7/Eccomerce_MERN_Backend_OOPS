@@ -13,11 +13,11 @@ class OrderDetails extends Model{
         type:DataType.UUID,
         defaultValue:DataType.UUIDV4
     })
-   declare orderDetails:string
+   declare orderDetailsId:string
 
     @Column({
         type:DataType.INTEGER,
-        allowNull:false
+        defaultValue:1
     })
    declare quantity:number
 }
