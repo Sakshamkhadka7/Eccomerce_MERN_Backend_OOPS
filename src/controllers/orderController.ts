@@ -23,8 +23,7 @@ class OrderController {
     const userId = req.user?.userId;
     const { phoneNumber, addressLine, totalAmount, paymentMethod } = req.body;
     const products: IProduct[] = req.body.products;
-    console.log(products);
-    products.forEach((prod) => console.log(prod));
+
 
     if (!phoneNumber || !addressLine || !totalAmount || products.length == 0) {
       return sendResponse(res, 403, "All fields are mandatory to filled");
@@ -59,9 +58,9 @@ class OrderController {
         purchase_order_name: "order_" + orderData.orderId,
       };
 
-      const response = axios.post("https://dev.khalti.com/api/v2/", data, {
+      const response = axios.post("https://dev.khalti.com/api/v2/epayment/initiate/", data, {
         headers: {
-          Authorization: "Key ",
+          Authorization: "Key 0c7fc13f10f9470fb26dffbf4c077e27",
         },
       });
 
