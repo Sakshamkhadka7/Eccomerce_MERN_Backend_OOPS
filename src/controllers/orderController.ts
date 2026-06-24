@@ -73,6 +73,7 @@ class OrderController {
       return res.status(200).json({
         message: "Order Created Successfully",
         url: khaltiResponse.payment_url,
+        pidx:khaltiResponse.pidx
       });
     } else {
     }
