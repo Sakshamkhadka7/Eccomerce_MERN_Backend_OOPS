@@ -24,7 +24,6 @@ class OrderController {
     const { phoneNumber, addressLine, totalAmount, paymentMethod } = req.body;
     const products: IProduct[] = req.body.products;
 
-
     if (!phoneNumber || !addressLine || !totalAmount || products.length == 0) {
       return sendResponse(res, 403, "All fields are mandatory to filled");
     }
@@ -43,12 +42,12 @@ class OrderController {
         orderId: orderData.orderId,
       });
     });
-
+    let paymentData;
+    paymentData = await Payment.create({
+      orderId: orderData.orderId,
+      paymentMethod: paymentMethod,
+    });
     if (paymentMethod == PaymentMethod.COD) {
-      await Payment.create({
-        orderId: orderData.orderId,
-        paymentMethod: paymentMethod,
-      });
     } else if (paymentMethod == PaymentMethod.khalti) {
       const data = {
         return_url: "http://localhost:5173/",
@@ -58,17 +57,47 @@ class OrderController {
         purchase_order_name: "order_" + orderData.orderId,
       };
 
-      const response = axios.post("https://dev.khalti.com/api/v2/epayment/initiate/", data, {
-        headers: {
-          Authorization: "Key 0c7fc13f10f9470fb26dffbf4c077e27",
+      const response = await axios.post(
+        "https://dev.khalti.com/api/v2/epayment/initiate/",
+        data,
+        {
+          headers: {
+            Authorization: "Key 0c7fc13f10f9470fb26dffbf4c077e27",
+          },
         },
-      });
+      );
 
-      console.log(response);
+      const khaltiResponse = response.data;
+      paymentData.pidx = khaltiResponse.pidx;
+      paymentData.save();
+      return res.status(200).json({
+        message: "Order Created Successfully",
+        url: khaltiResponse.payment_url,
+      });
     } else {
     }
 
     return sendResponse(res, 201, "Order created successfully", orderData);
+  }
+
+  static async verfiyTransaction(req: Request, res: Response): Promise<void> {
+    const { pidx } = req.body;
+    if (!pidx) {
+      return sendResponse(res, 404, "pidx is required");
+    }
+
+    const response = await axios.post(
+      "https://dev.khalti.com/api/v2/epayment/lookup/",
+      {
+        pidx: pidx,
+      },
+      {
+        headers: {
+          Authorization: "Key 0c7fc13f10f9470fb26dffbf4c077e27",
+        },
+      },
+    );
+    console.log(response);
   }
 }
 
