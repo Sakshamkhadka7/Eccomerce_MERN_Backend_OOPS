@@ -13,7 +13,7 @@ class OrderDetails extends Model{
         type:DataType.UUID,
         defaultValue:DataType.UUIDV4
     })
-   declare orderDetailsId:string
+   declare id:string
 
     @Column({
         type:DataType.INTEGER,
