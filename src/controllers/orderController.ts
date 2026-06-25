@@ -47,8 +47,7 @@ class OrderController {
       orderId: orderData.orderId,
       paymentMethod: paymentMethod,
     });
-    if (paymentMethod == PaymentMethod.COD) {
-    } else if (paymentMethod == PaymentMethod.khalti) {
+    if (paymentMethod == PaymentMethod.khalti) {
       const data = {
         return_url: "http://localhost:5173/",
         website_url: "http://localhost:5173/",
@@ -75,7 +74,12 @@ class OrderController {
         url: khaltiResponse.payment_url,
         pidx: khaltiResponse.pidx,
       });
-    } else {
+    } else if (paymentMethod== PaymentMethod.Esewa) {
+
+    }else{
+      res.status(200).json({
+        message:"Order created successfully"
+      })
     }
 
     return sendResponse(res, 201, "Order created successfully", orderData);
