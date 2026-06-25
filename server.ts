@@ -55,6 +55,20 @@ function startServer() {
         },
       );
     }
+
+    socket.on("updateOrderStatus", (data) => {
+      const { status, orderId, userId } = data;
+
+      const findUser = onlineUsers.find((user) => user.userId == userId);
+      if (findUser) {
+        io.to(findUser.socketId).emit(
+          "success",
+          "Order status updated successfully",
+        );
+      } else {
+        socket.emit("error", "User is not online");
+      }
+    });
   });
 }
 
