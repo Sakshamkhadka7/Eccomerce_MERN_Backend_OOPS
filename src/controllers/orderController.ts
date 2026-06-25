@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import sendResponse from "../services/sendResponse.js";
 import Order from "../database/models/orderModel.js";
 import OrderDetails from "../database/models/orderDetailModel.js";
-import { PaymentMethod } from "../globalTypes/index.js";
+import { PaymentMethod, PaymentStatus } from "../globalTypes/index.js";
 import Payment from "../database/models/paymentModel.js";
 import axios from "axios";
 
@@ -73,7 +73,7 @@ class OrderController {
       return res.status(200).json({
         message: "Order Created Successfully",
         url: khaltiResponse.payment_url,
-        pidx:khaltiResponse.pidx
+        pidx: khaltiResponse.pidx,
       });
     } else {
     }
@@ -99,6 +99,27 @@ class OrderController {
       },
     );
     console.log(response);
+
+    const data = response.data;
+    if (data.status === "Completed") {
+      await Payment.update(
+        {
+          paymentStatus: PaymentStatus.Paid,
+        },
+        {
+          where: {
+            pidx: pidx,
+          },
+        },
+      );
+      res.status(200).json({
+        message: "Payment verified successfully",
+      });
+    } else {
+      res.status(200).json({
+        message: "Payment not verified or cancelled",
+      });
+    }
   }
 }
 
