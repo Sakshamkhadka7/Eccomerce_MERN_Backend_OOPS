@@ -44,12 +44,13 @@ class UserController {
 
     res.status(201).json({
       message: "User created successfully",
+      data:user
     });
   }
 
   static async login(req: Request, res: Response) {
     const { email, password } = req.body;
-    console.log("User password", password);
+
     if (!email || !password) {
       res.status(400).json({
         message: "Please provide email and password",

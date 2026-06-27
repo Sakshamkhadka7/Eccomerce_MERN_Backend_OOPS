@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Cart from "../database/models/cartModel.js";
 import Product from "../database/models/productModel.js";
+import { model } from "mongoose";
+import Category from "../database/models/categoryModel.js";
 
 interface IRequest extends Request {
   user?: {
@@ -30,14 +32,31 @@ class CartController {
       cartExists.quantity += quantity;
       cartExists.save();
     } else {
-      await Cart.create({
+     await Cart.create({
         userId,
         productId,
         quantity,
       });
 
+     const cart=await Cart.findAll({
+      where:{
+        userId
+      },
+      include:[
+        {
+          model:Product,
+          include:[
+            {
+              model:Category
+            }
+          ]
+        }
+      ]
+     })
+
       res.status(200).json({
         message: "Product is added to cart",
+        data:cart
       });
     }
   }
@@ -52,7 +71,7 @@ class CartController {
       include: [
         {
           model: Product,
-          attributes: ["productName", "productPrice", "productImage"],
+          attributes: ["productName", "productPrice", "productImage","productId"],
         },
       ],
     });

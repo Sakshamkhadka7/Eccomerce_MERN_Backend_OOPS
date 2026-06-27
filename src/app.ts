@@ -1,7 +1,12 @@
 import express from "express";
-
+import cors from "cors"
 
 const app=express();
+app.use(cors({
+    origin:"*"
+}))
+
+
 
 import "./database/connection.js";
 import userRouter from "./routes/userRoute.js";
@@ -15,5 +20,8 @@ app.use("/api/category",categoryRoute)
 app.use("/api/product",productRoute)
 app.use("/api/order",orderRouter)
 app.use("/api/cart",cartRouter);
+
+app.use(express.static("./src/uploads"))
+
 
 export default app
