@@ -145,7 +145,7 @@ class CartController {
       cartItems.quantity = quantity;
       await cartItems.save();
       res.status(200).json({
-        message:"Cart updated !"
+        message:"Cart updated !", 
       })
     }
   }

@@ -21,10 +21,18 @@ interface IRequest extends Request {
 class OrderController {
   static async createOrder(req: IRequest, res: Response) {
     const userId = req.user?.userId;
-    const { phoneNumber, addressLine, totalAmount, paymentMethod } = req.body;
+    const {
+      phoneNumber,
+      addressLine,
+      totalAmount,
+      paymentMethod,
+      firstName,
+      lastName,
+      email,
+    } = req.body;
     const products: IProduct[] = req.body.products;
 
-    if (!phoneNumber || !addressLine || !totalAmount || products.length == 0) {
+    if (!phoneNumber || !addressLine || !totalAmount || products.length == 0 || !firstName || !lastName || !email) {
       return sendResponse(res, 403, "All fields are mandatory to filled");
     }
 
@@ -33,6 +41,9 @@ class OrderController {
       addressLine,
       totalAmount,
       userId,
+      firstName,
+      lastName,
+      email,
     });
 
     products.forEach(async (product) => {
@@ -74,12 +85,11 @@ class OrderController {
         url: khaltiResponse.payment_url,
         pidx: khaltiResponse.pidx,
       });
-    } else if (paymentMethod== PaymentMethod.Esewa) {
-
-    }else{
+    } else if (paymentMethod == PaymentMethod.Esewa) {
+    } else {
       res.status(200).json({
-        message:"Order created successfully"
-      })
+        message: "Order created successfully",
+      });
     }
 
     return sendResponse(res, 201, "Order created successfully", orderData);
