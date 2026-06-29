@@ -29,10 +29,23 @@ class OrderController {
       firstName,
       lastName,
       email,
-    } = req.body;
-    const products: IProduct[] = req.body.products;
+      state,
+      zipcode,
+    } = req.body.data;
+    const products: IProduct[] = req.body.data.products;
+    console.log("products", products);
 
-    if (!phoneNumber || !addressLine || !totalAmount || products.length == 0 || !firstName || !lastName || !email) {
+    if (
+      !phoneNumber ||
+      !addressLine ||
+      !totalAmount ||
+      products.length == 0 ||
+      !firstName ||
+      !lastName ||
+      !email ||
+      !state ||
+      !zipcode
+    ) {
       return sendResponse(res, 403, "All fields are mandatory to filled");
     }
 
@@ -44,10 +57,13 @@ class OrderController {
       firstName,
       lastName,
       email,
+      state,
+      zipcode,
     });
 
+    let data;
     products.forEach(async (product) => {
-      await OrderDetails.create({
+      data = await OrderDetails.create({
         quantity: product.productQty,
         productId: product.productId,
         orderId: orderData.orderId,
@@ -58,6 +74,7 @@ class OrderController {
       orderId: orderData.orderId,
       paymentMethod: paymentMethod,
     });
+
     if (paymentMethod == PaymentMethod.khalti) {
       const data = {
         return_url: "http://localhost:5173/",
@@ -84,11 +101,13 @@ class OrderController {
         message: "Order Created Successfully",
         url: khaltiResponse.payment_url,
         pidx: khaltiResponse.pidx,
+        data,
       });
     } else if (paymentMethod == PaymentMethod.Esewa) {
     } else {
       res.status(200).json({
         message: "Order created successfully",
+        data,
       });
     }
 
@@ -132,6 +151,49 @@ class OrderController {
     } else {
       res.status(200).json({
         message: "Payment not verified or cancelled",
+      });
+    }
+  }
+
+  static async fetchMyOrder(req: IRequest, res: Response) {
+    const userId = req.user?.userId;
+    const orders = await Order.findAll({
+      where: {
+        userId,
+      },
+    });
+
+    if (orders.length > 0) {
+      res.status(200).json({
+        message: "Order fetched successfully",
+        data: orders,
+      });
+    } else {
+      res.status(404).json({
+        message: "No order found",
+        data: null,
+      });
+    }
+  }
+
+  static async fetchMyOrderDetail(req: IRequest, res: Response) {
+    const orderId = req.params.id;
+    const userId = req.user?.userId;
+    const orders = await Order.findAll({
+      where: {
+        orderId,
+      },
+    });
+
+    if (orders.length > 0) {
+      res.status(200).json({
+        message: "Order fetched successfully",
+        data: orders,
+      });
+    } else {
+      res.status(404).json({
+        message: "No order found",
+        data: null,
       });
     }
   }
