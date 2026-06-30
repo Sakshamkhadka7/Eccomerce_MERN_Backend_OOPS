@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import sendResponse from "../services/sendResponse.js";
 import Order from "../database/models/orderModel.js";
 import OrderDetails from "../database/models/orderDetailModel.js";
-import { OrderStaus, PaymentMethod, PaymentStatus } from "../globalTypes/index.js";
+import {
+  OrderStaus,
+  PaymentMethod,
+  PaymentStatus,
+} from "../globalTypes/index.js";
 import Payment from "../database/models/paymentModel.js";
 import axios from "axios";
 import Product from "../database/models/productModel.js";
@@ -18,6 +22,10 @@ interface IRequest extends Request {
     username: string;
     email: string;
   };
+}
+
+class OrderWithPayment extends Order{
+  declare paymentId:string
 }
 
 class OrderController {
@@ -165,11 +173,11 @@ class OrderController {
         userId,
       },
       attributes: ["totalAmount", "orderStaus", "orderId"],
-      include:[
-         {
-        model: Payment,
-        attributes: ["paymentMethod", "paymentStatus"],
-      }
+      include: [
+        {
+          model: Payment,
+          attributes: ["paymentMethod", "paymentStatus"],
+        },
       ],
     });
 
@@ -193,27 +201,35 @@ class OrderController {
       where: {
         orderId,
       },
-      include:[
+      include: [
         {
-          model:Order,
-          include:[
+          model: Order,
+          include: [
             {
-            model:Payment,
-            attributes:["paymentMethod","paymentStatus"]
-          }
+              model: Payment,
+              attributes: ["paymentMethod", "paymentStatus"],
+            },
           ],
-         attributes:["totalAmount","addressLine","orderStaus","phoneNumber","state","firstName","lastName"]
-
-        },{
-          model:Product,
-          include:[
+          attributes: [
+            "totalAmount",
+            "addressLine",
+            "orderStaus",
+            "phoneNumber",
+            "state",
+            "firstName",
+            "lastName",
+          ],
+        },
+        {
+          model: Product,
+          include: [
             {
-              model:Category
-            }
+              model: Category,
+            },
           ],
-          attributes:["productName","productPrice","productImage"]
-        }
-      ]
+          attributes: ["productName", "productPrice", "productImage"],
+        },
+      ],
     });
 
     if (orders.length > 0) {
@@ -229,45 +245,108 @@ class OrderController {
     }
   }
 
-  static async cancelOrder(req:IRequest,res:Response):Promise<void>{
-     const userId=req.user?.userId
-     const orderId=req.params.orderId;
-     
-   const [cancel]= await Order.findAll({
-      where:{
-        userId:userId,
-        orderId:orderId
-      }
-     })
+  static async cancelOrder(req: IRequest, res: Response): Promise<void> {
+    const userId = req.user?.userId;
+    const orderId = req.params.orderId;
 
-     if(!cancel){
+    const [cancel] = await Order.findAll({
+      where: {
+        userId: userId,
+        orderId: orderId,
+      },
+    });
+
+    if (!cancel) {
       res.status(400).json({
-        message:"No Order is found"
-      })
+        message: "No Order is found",
+      });
 
-      return
-     }
+      return;
+    }
 
-     if(cancel.orderStaus ===OrderStaus.OntheWay  || OrderStaus.Prepration){
+    if (cancel.orderStaus === OrderStaus.OntheWay || OrderStaus.Prepration) {
       res.status(403).json({
-        message:"You cannot cancelled order , it is on the way or preparation mode"
-      })
-     }
+        message:
+          "You cannot cancelled order , it is on the way or preparation mode",
+      });
+    }
 
-     await Order.update({
-      OrderStaus:OrderStaus.Cancelled
-     },{
+    await Order.update(
+      {
+        orderStaus: OrderStaus.Cancelled,
+      },
+      {
+        where: {
+          orderId: orderId,
+        },
+      },
+    );
+
+    res.status(200).json({
+      message: "Order cancelled successfully",
+    });
+  }
+
+  static async changeOrderStatus(req: IRequest, res: Response): Promise<void> {
+    const orderId = req.params.id;
+    const { orderStaus } = req.body;
+    if (!orderId || !orderStaus) {
+      res.status(403).json({
+        message: "Please provide orderId and orderStatus",
+      });
+    }
+
+    await Order.update(
+      {
+        orderStaus: orderStaus,
+      },
+      {
+        where: {
+          orderId,
+        },
+      },
+    );
+
+    res.status(200).json({
+      message: "Order status updated successfully",
+    });
+  }
+
+  static async deleteOrder(req:IRequest,res:Response){
+    const orderId=req.params.id;
+     
+    //@ts-ignore
+    const order:OrderWithPayment=await Order.findByPk(orderId) as OrderWithPayment
+    const paymentId=order?.paymentId
+
+
+    if(!order){
+      res.status(404).json({
+        message:"you donot have that orderId"
+      })
+    }
+
+    await OrderDetails.destroy({
+      where:{
+       orderId
+      }
+    })
+
+    await Payment.destroy({
+       where:{
+        paymentId:paymentId
+       }
+    })
+
+    await Order.destroy({
       where:{
         orderId:orderId
       }
-     })
+    })
 
-     res.status(200).json({
-      message:"Order cancelled successfully"
-     })
-   
-     
-
+    res.status(200).json({
+      message:"Order and asscoiated with or deleted"
+    })
   }
 }
 
