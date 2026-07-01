@@ -263,12 +263,13 @@ class OrderController {
 
       return;
     }
-
-    if (cancel.orderStaus === OrderStaus.OntheWay || OrderStaus.Prepration) {
+     console.log("Order status : ",cancel.orderStaus);
+    if (cancel.orderStaus === OrderStaus.OntheWay || cancel.orderStaus ===  OrderStaus.Prepration) {
       res.status(403).json({
         message:
           "You cannot cancelled order , it is on the way or preparation mode",
       });
+      return
     }
 
     await Order.update(

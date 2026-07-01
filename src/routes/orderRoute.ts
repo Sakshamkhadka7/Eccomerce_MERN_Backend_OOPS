@@ -20,8 +20,8 @@ orderRouter.get(
   userMiddleware.isUserLogin,
   errorHandler(OrderController.fetchMyOrder),
 );
-orderRouter.post(
-  "/admin/cancel-order/:id",
+orderRouter.patch(
+  "/cancel-order/:orderId",
   userMiddleware.isUserLogin,
   userMiddleware.accessTo(Role.Customer),
   OrderController.cancelOrder,
@@ -32,7 +32,7 @@ orderRouter.delete(
   userMiddleware.accessTo(Role.Admin),
   OrderController.deleteOrder,
 );
-orderRouter.post(
+orderRouter.patch(
   "/admin/change-status",
   userMiddleware.isUserLogin,
   userMiddleware.accessTo(Role.Admin),
