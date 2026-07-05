@@ -205,6 +205,17 @@ class UserController {
     user.save();
     sendResponse(res, 200, "Password reset succcessfully");
   }
+
+  static async fetchUsers(req:Request,res:Response){
+    const users=await User.findAll({
+      attributes:["userId","username","email"],
+    })
+
+    res.status(200).json({
+      message:"Users fetched successfully",
+      data:users
+    })
+  }
 }
 
 export default UserController;
