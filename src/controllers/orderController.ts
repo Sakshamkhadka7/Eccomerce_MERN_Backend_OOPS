@@ -218,6 +218,7 @@ class OrderController {
             "state",
             "firstName",
             "lastName",
+            "userId"
           ],
         },
         {
@@ -349,6 +350,32 @@ class OrderController {
       message:"Order and asscoiated with or deleted"
     })
   }
+  
+  static async fetchAllOrder(req: IRequest, res: Response) {
+   
+    const orders = await Order.findAll({
+      attributes: ["totalAmount", "orderStaus", "orderId"],
+      include: [
+        {
+          model: Payment,
+          attributes: ["paymentMethod", "paymentStatus"],
+        },
+      ],
+    });
+
+    if (orders.length > 0) {
+      res.status(200).json({
+        message: "Order fetched successfully",
+        data: orders,
+      });
+    } else {
+      res.status(404).json({
+        message: "No order found",
+        data: null,
+      });
+    }
+  }
+  
 }
 
 export default OrderController;

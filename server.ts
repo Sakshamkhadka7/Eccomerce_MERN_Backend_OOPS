@@ -36,7 +36,9 @@ function startServer() {
   };
 
   io.on("connection", (socket) => {
-    const token = socket.handshake.headers.token;
+    console.log("connected");
+    const {token} = socket.handshake.auth;
+    console.log("Token : ",token);
     if (token) {
       jwt.verify(
         token as string,
@@ -51,16 +53,18 @@ function startServer() {
               socket.emit("Error , No user found with that token");
               return;
             }
-
+            console.log(socket.id, result.userId, userData.role,"socket result userData");
             addToOnlineUser(socket.id, result.userId, userData.role);
             console.log(onlineUsers);
           }
         },
       );
+      
     } else {
+      console.log("Error triggered");
       socket.emit("error", "Please provide a token");
     }
-
+console.log(onlineUsers);
     socket.on("updateOrderStatus", async(data) => {
       const { status, orderId, userId } = data;
 
@@ -77,8 +81,7 @@ function startServer() {
           },
         );
         io.to(findUser.socketId).emit(
-          "success",
-          "Order status updated successfully",
+         "statusUpdate", data
         );
       } else {
         socket.emit("error", "User is not online");

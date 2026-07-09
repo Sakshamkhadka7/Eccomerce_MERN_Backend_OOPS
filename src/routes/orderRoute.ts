@@ -44,5 +44,5 @@ orderRouter.get(
   userMiddleware.isUserLogin,
   errorHandler(OrderController.fetchMyOrderDetail),
 );
-
+orderRouter.get("/fetchallorders",userMiddleware.isUserLogin,userMiddleware.accessTo(Role.Admin),OrderController.fetchAllOrder)
 export default orderRouter;

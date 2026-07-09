@@ -7,6 +7,12 @@ import sendEmail from "../services/sendMail.js";
 import checkOtpExpiration from "../services/verifyOtp.js";
 import sendResponse from "../services/sendResponse.js";
 
+interface IRequest extends Request {
+  user?: {
+    userId: string;
+  };
+}
+
 class UserController {
   static async register(req: Request, res: Response) {
     const { username, email, password } = req.body;
@@ -44,7 +50,7 @@ class UserController {
 
     res.status(201).json({
       message: "User created successfully",
-      data:user
+      data: user,
     });
   }
 
@@ -58,7 +64,7 @@ class UserController {
 
       return;
     }
-    const [user] = await User.findAll({
+    const [user] = await User.findAll ({
       where: {
         email: email,
       },
@@ -201,21 +207,89 @@ class UserController {
       return;
     }
 
-    user.password = bcrypt.hashSync(newPassword,12);
+    user.password = bcrypt.hashSync(newPassword, 12);
     user.save();
     sendResponse(res, 200, "Password reset succcessfully");
   }
 
-  static async fetchUsers(req:Request,res:Response){
-    const users=await User.findAll({
-      attributes:["userId","username","email"],
-    })
+  static async fetchUsers(req: Request, res: Response) {
+    const users = await User.findAll({
+      attributes: ["userId", "username", "email"],
+    });
 
     res.status(200).json({
-      message:"Users fetched successfully",
-      data:users
-    })
+      message: "Users fetched successfully",
+      data: users,
+    });
   }
+
+  static async deleteUsers(req: Request, res: Response) {
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({
+        message: "please provide a id",
+      });
+      return;
+    }
+
+    await User.destroy({
+      where: {
+        userId: id,
+      },
+    });
+
+    res.status(200).json({
+      message: "Users deleted successfully",
+    });
+  }
+
+  static async getMe(req: IRequest, res: Response) {
+    const userId = req?.user?.userId;
+    if (!userId) {
+      res.status(400).json({
+        message: "User Id not found",
+      });
+      return;
+    }
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      res.status(404).json({
+        message: "User not found with this id",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      message: "User found and fetched successfully",
+      data: user,
+    });
+  }
+  
+  static async logout(req:IRequest,res:Response){
+    const userId=req.user?.userId;
+    if(!userId){
+      res.status(400).json({
+        message:"User is not login to logout"
+      })
+      return
+    }
+
+    const user=await User.findByPk(userId);
+    if(!user){
+       res.status(404).json({
+        message:"User not found"
+      })
+      return
+    }
+  
+    res.status(200).json({
+      message:"Logout successfull"
+    })
+    
+
+  }
+
 }
 
 export default UserController;

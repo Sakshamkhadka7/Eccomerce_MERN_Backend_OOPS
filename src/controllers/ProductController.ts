@@ -45,7 +45,7 @@ class ProductController {
       return;
     }
 
-    await Product.create({
+   const product= await Product.create({
       productName,
       productDescriptions,
       productPrice,
@@ -57,6 +57,7 @@ class ProductController {
 
     res.status(200).json({
       message: "Product created successfully",
+      data:product
     });
   }
 
