@@ -32,4 +32,6 @@ userRouter
   .route("/getme")
   .get(userMiddleware.isUserLogin, UserController.getMe);
 
+userRouter.route("/logout").post(userMiddleware.isUserLogin,userMiddleware.accessTo(Role.Admin),UserController.logout);
+
 export default userRouter;
