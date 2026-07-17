@@ -88,7 +88,7 @@ class OrderController {
 
     if (paymentMethod == PaymentMethod.khalti) {
       const data = {
-        return_url: "http://localhost:5173/",
+      return_url: "http://localhost:5173/payment-success",
         website_url: "http://localhost:5173/",
         amount: totalAmount * 100,
         purchase_order_id: orderData.orderId,
@@ -115,14 +115,13 @@ class OrderController {
         data,
       });
     } else if (paymentMethod == PaymentMethod.Esewa) {
+
     } else {
       res.status(200).json({
         message: "Order created successfully",
-        data,
+        data:orderData,
       });
     }
-
-    return sendResponse(res, 201, "Order created successfully", orderData);
   }
 
   static async verfiyTransaction(req: Request, res: Response): Promise<void> {
@@ -168,7 +167,7 @@ class OrderController {
 
   static async fetchMyOrder(req: IRequest, res: Response) {
     const userId = req.user?.userId;
-    const orders = await Order.findAll({
+    const orders = await Order.findAll({  
       where: {
         userId,
       },

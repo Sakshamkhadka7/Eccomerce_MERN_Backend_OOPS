@@ -33,15 +33,13 @@ class CategoryController {
       return;
     }
 
-
-
-   const category= await Category.create({
+    const category = await Category.create({
       categoryName,
     });
 
     res.status(200).json({
       message: "Category is added",
-      data:category
+      data: category,
     });
   }
 
@@ -53,9 +51,9 @@ class CategoryController {
     });
   }
 
-  async deleteCategory(req: Request, res: Response):Promise<void> {
+  async deleteCategory(req: Request, res: Response): Promise<void> {
     const { id } = req.params;
-    console.log("Delete Id : ",id);
+    console.log("Delete Id : ", id);
     if (!id) {
       res.status(400).json({
         message: "Please provide a ID",
@@ -77,7 +75,7 @@ class CategoryController {
     } else {
       await Category.destroy({
         where: {
-          categoryId:id,
+          categoryId: id,
         },
       });
 
@@ -88,9 +86,9 @@ class CategoryController {
   }
 
   async updateCategory(req: Request, res: Response) {
-    const { id } = req.params;
+    const { categoryId } = req.params;
     const { categoryName } = req.body;
-    if (!id || !categoryName) {
+    if (!categoryId || !categoryName) {
       res.status(400).json({
         message: "Please provide a ID and categoryName",
       });
@@ -99,7 +97,7 @@ class CategoryController {
     }
     const data = await Category.findAll({
       where: {
-        categoryId: id,
+        categoryId: categoryId,
       },
     });
 
@@ -115,10 +113,17 @@ class CategoryController {
         },
         {
           where: {
-            categoryId: id,
+            categoryId: categoryId,
           },
         },
       );
+
+      const updatedCategory = await Category.findByPk(categoryId);
+
+      res.status(200).json({
+        message: "Category updated successfully",
+        data: updatedCategory,
+      });
     }
   }
 }

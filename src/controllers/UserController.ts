@@ -45,7 +45,7 @@ class UserController {
     await sendEmail({
       to: email,
       subject: "Register Successfully",
-      text: "Welcome to DigitalPasal ,You have register successfully",
+      text: "Welcome to Glow Girl Accessoried ,You have register successfully",
     });
 
     res.status(201).json({
@@ -61,7 +61,6 @@ class UserController {
       res.status(400).json({
         message: "Please provide email and password",
       });
-
       return;
     }
     const [user] = await User.findAll ({
@@ -75,7 +74,6 @@ class UserController {
       });
       return;
     } else {
-      console.log("USer json", user);
       const equal = await bcrypt.compare(password, user.dataValues.password);
       if (!equal) {
         res.status(400).json({
@@ -88,6 +86,7 @@ class UserController {
         res.status(200).json({
           message: "Login successfully",
           token,
+          data:user
         });
 
         return;
@@ -274,7 +273,6 @@ class UserController {
       })
       return
     }
-
     const user=await User.findByPk(userId);
     if(!user){
        res.status(404).json({
@@ -285,9 +283,7 @@ class UserController {
   
     res.status(200).json({
       message:"Logout successfull"
-    })
-    
-
+    })    
   }
 
 }

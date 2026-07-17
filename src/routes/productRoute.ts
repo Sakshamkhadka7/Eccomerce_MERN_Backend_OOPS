@@ -16,10 +16,11 @@ productRoute
 productRoute.route("/getProduct").get(ProductController.getAllProduct);
 productRoute.route("/getSingleProduct/:id").get(ProductController.getSingleProduct);
 productRoute
-  .route("/updateProduct/:id")
+  .route("/updateProduct/:productId")
   .put(
     userMiddleware.isUserLogin,
     userMiddleware.accessTo(Role.Admin),
+    upload.single("productImage"),
     ProductController.updateProduct,
   );
 productRoute

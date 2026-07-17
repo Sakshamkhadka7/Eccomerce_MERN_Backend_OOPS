@@ -12,9 +12,9 @@ import Category from "../database/models/categoryModel.js";
 interface Update {
   productName?: string;
   productDescriptions?: string;
-  productPrice?: string;
-  productTotalStock?: string;
-  productDiscount?: string;
+  productPrice?: number;
+  productTotalStock?: number;
+  productDiscount?: number;
   categoryId?: string;
   productImage?: string;
 }
@@ -36,8 +36,7 @@ class ProductController {
       !productName ||
       !productDescriptions ||
       !productPrice ||
-      !productTotalStock ||
-      !categoryId
+      !productTotalStock
     ) {
       res.status(400).json({
         message: "All fields are mandatory",
@@ -45,19 +44,24 @@ class ProductController {
       return;
     }
 
-   const product= await Product.create({
+    const payload: Record<string, unknown> = {
       productName,
       productDescriptions,
-      productPrice,
-      productTotalStock,
-      productDiscount: productDiscount || 0,
-      categoryId,
+      productPrice: Number(productPrice),
+      productTotalStock: Number(productTotalStock),
+      productDiscount: Number(productDiscount || 0),
       productImage: fileName,
-    });
+    };
+
+    if (categoryId && Object.prototype.hasOwnProperty.call(Product.rawAttributes, "categoryId")) {
+      payload.categoryId = categoryId;
+    }
+
+    const product = await Product.create(payload);
 
     res.status(200).json({
       message: "Product created successfully",
-      data:product
+      data: product,
     });
   }
 
@@ -65,7 +69,7 @@ class ProductController {
     const datas = await Product.findAll({
       include: {
         model: Category,
-        attributes:['categoryId','categoryName']
+        attributes: ["categoryId", "categoryName"],
       },
     });
 
@@ -83,8 +87,7 @@ class ProductController {
       },
       include: {
         model: Category,
-        attributes:['categoryId','categoryName']
-
+        attributes: ["categoryId", "categoryName"],
       },
     });
 
@@ -95,8 +98,8 @@ class ProductController {
   }
 
   async updateProduct(req: Request, res: Response) {
-    const { id } = req.params;
-    if (!id) {
+    const { productId } = req.params;
+    if (!productId) {
       res.status(403).json({
         message: "Id is required",
       });
@@ -106,7 +109,7 @@ class ProductController {
 
     const product = await Product.findOne({
       where: {
-        productId: id,
+        productId: productId,
       },
     });
 
@@ -125,27 +128,44 @@ class ProductController {
       categoryId,
     } = req.body;
 
-    const updateData: Update = {
+    const updateData: Record<string, unknown> = {
       productName,
       productDescriptions,
-      productPrice,
-      productTotalStock,
-      productDiscount,
-      categoryId,
+      productPrice: productPrice !== undefined ? Number(productPrice) : undefined,
+      productTotalStock:
+        productTotalStock !== undefined ? Number(productTotalStock) : undefined,
+      productDiscount:
+        productDiscount !== undefined ? Number(productDiscount) : undefined,
     };
+
+    if (categoryId && Object.prototype.hasOwnProperty.call(Product.rawAttributes, "categoryId")) {
+      updateData.categoryId = categoryId;
+    }
 
     if (req.file) {
       updateData.productImage = req.file.filename;
     }
 
-    await Product.update(updateData, {
+    const cleanUpdateData = Object.fromEntries(
+      Object.entries(updateData).filter(([, value]) => value !== undefined && value !== ""),
+    );
+
+    await Product.update(cleanUpdateData, {
       where: {
-        productId: id,
+        productId: productId,
+      },
+    });
+
+    const updatedProduct = await Product.findByPk(productId, {
+      include: {
+        model: Category,
+        attributes: ["categoryId", "categoryName"],
       },
     });
 
     res.status(200).json({
       message: "Product updated successfully",
+      data: updatedProduct,
     });
   }
 
@@ -175,4 +195,4 @@ class ProductController {
   }
 }
 
-export default new ProductController;
+export default new ProductController();

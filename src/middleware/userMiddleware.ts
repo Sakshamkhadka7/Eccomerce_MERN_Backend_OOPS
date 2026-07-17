@@ -19,44 +19,55 @@ interface IExtendedRequest extends Request {
 }
 
 class UserMiddleware {
-  async isUserLogin(
-    req: IExtendedRequest,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    const token = req.headers.authorization;
-    if (!token) {
-      res.status(403).json({
-        message: "Token not found",
-      });
+async isUserLogin(
+  req: IExtendedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
 
-      return;
-    }
-    jwt.verify(
-      token,
-      envConfig.secretKey as string,
-      async (err, result: any) => {
-        if (err) {
-          res.status(403).json({
-            message: "Invalid Token !",
-          });
+  const authHeader = req.headers.authorization;
 
-          return;
-        } else {
-          console.log(result);
-          const userData = await User.findByPk(result.userId);
-          if (!userData) {
-            res.status(404).json({
-              message: "No user with that ID found",
-            });
-            return;
-          }
-          req.user = userData;
-          next();
-        }
-      },
-    );
+  if (!authHeader) {
+    res.status(403).json({
+      message: "Token not found",
+    });
+    return;
   }
+
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    res.status(403).json({
+      message: "Invalid Token Format",
+    });
+    return;
+  }
+
+  jwt.verify(
+    token,
+    envConfig.secretKey as string,
+    async (err, result: any) => {
+
+      if (err) {
+        return res.status(403).json({
+          message: "Invalid Token",
+        });
+      }
+
+      const userData = await User.findByPk(result.userId);
+
+      if (!userData) {
+        return res.status(404).json({
+          message: "No user found",
+        });
+      }
+
+      req.user = userData;
+
+      next();
+    }
+  );
+}
 
   accessTo(...roles: Role[]) {
     return (req: IExtendedRequest, res: Response, next: NextFunction) => {

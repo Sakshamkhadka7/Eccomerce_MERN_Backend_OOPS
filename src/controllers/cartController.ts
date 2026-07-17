@@ -119,6 +119,27 @@ class CartController {
     });
   }
 
+
+  static async clearCart(req:IRequest,res:Response){
+    const userId=req.user?.userId;
+    if(!userId){
+      res.status(400).json({
+        message:"User id not found"
+      })
+      return
+    }
+
+    await Cart.destroy({
+    where: {
+        userId: req.user?.userId
+    }
+});
+
+res.status(200).json({
+    message: "Cart cleared successfully"
+});
+  }
+
   static async updateItemsQuantity(req: IRequest, res: Response) {
     const userId = req.user?.userId;
     const { productId } = req.params;

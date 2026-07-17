@@ -30,7 +30,7 @@ orderRouter.delete(
   "/admim/delete-order/:id",
   userMiddleware.isUserLogin,
   userMiddleware.accessTo(Role.Admin),
-  OrderController.deleteOrder,
+  OrderController.deleteOrder,  
 );
 orderRouter.patch(
   "/admin/change-status",
